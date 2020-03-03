@@ -1,0 +1,22 @@
+﻿@{
+    ViewData["Title"] = "Resetuj klucz autoryzujący";
+    ViewData["ActivePage"] = ManageNavPages.TwoFactorAuthentication;
+}
+
+<h4>@ViewData["Title"]</h4>
+<div class="alert alert-warning" role="alert">
+    <p>
+        <span class="glyphicon glyphicon-warning-sign"></span>
+        <strong>Jeśli zresetujesz klucz autoryzujący, aplikacja autoryzująca nie będzie działać do czasu jej ponownej konfiguracji. </strong>
+    </p>
+    <p>
+        Ten proces wyłączy weryfikacje dwuetapową do czasu ponownej weryfikacji aplikacji autoryzującej.
+        Jeśli nie zakończysz konfiguracji aplikacji autoryzującej stracisz dostęp do konta.
+
+    </p>
+</div>
+<div>
+    <form id="reset-authenticator-form" method="post" class="form-group" asp-action="ResetAuthenticator">
+        <button id="reset-authenticator-button" class="btn btn-danger" type="submit">Resetuj klucz autoryzujący</button>
+    </form>
+</div>

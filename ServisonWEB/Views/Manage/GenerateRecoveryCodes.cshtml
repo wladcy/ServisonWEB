@@ -1,0 +1,24 @@
+﻿@{
+    ViewData["Title"] = "Generuj kody bezpieczeństwa";
+    ViewData["ActivePage"] = ManageNavPages.TwoFactorAuthentication;
+}
+
+<h4>@ViewData["Title"]</h4>
+<div class="alert alert-warning" role="alert">
+    <p>
+        <span class="glyphicon glyphicon-warning-sign"></span>
+        <strong>Zapisz kody w bezpieczne miejsce.</strong>
+    </p>
+    <p>
+        Jeśli nie będziesz miał dostępu do swojej aplikacji autoryzującej i stracisz kody bezpieczeństwa nie będziesz mieć dostępu do konta.
+    </p>
+    <p>
+        Generowanie nowych kodów bezpieczeństwa nie zmienia kluczy użytych w aplikacji autoryzującej. Jeśli chcesz zmienić klucz użyty w aplikacji autoryzującej powinieneś <a asp-action="ResetAuthenticatorWarning">zresetowac klucz.</a>
+
+    </p>
+</div>
+<div>
+    <form method="post" class="form-group" asp-action="GenerateRecoveryCodes">
+        <button class="btn btn-danger" type="submit">Generuj kody bezpieczeństwa</button>
+    </form>
+</div>

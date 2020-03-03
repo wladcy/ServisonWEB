@@ -1,0 +1,22 @@
+﻿@{
+    ViewData["Title"] = "Wyłącz weryfikację dwuetapową.";
+    ViewData["ActivePage"] = ManageNavPages.TwoFactorAuthentication;
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div class="alert alert-warning" role="alert">
+    <p>
+        <span class="glyphicon glyphicon-warning-sign"></span>
+        <strong>Ta akcja wyłącza weryfikacje dwuetapową.</strong>
+    </p>
+    <p>
+        Wyłączenie weryfikacji nie zmieni kluczy użytych w aplikacji autoryzującej. Jeśli chcesz zmienić klucz w aplikacji autoryzującej powinieneś użyć <a asp-action="ResetAuthenticatorWarning">resetowania.</a>
+    </p>
+</div>
+
+<div>
+    <form method="post" class="form-group" asp-action="Disable2fa">
+        <button class="btn btn-danger" type="submit">Wyłącz weryfikację dwuetapową</button>
+    </form>
+</div>
