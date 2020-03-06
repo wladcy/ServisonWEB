@@ -15,13 +15,13 @@ namespace Rental.Validators
             s.Restart();
             ValidationResult retval = new ValidationResult("");
             IPhoneModel rvm = (IPhoneModel)validationContext.ObjectInstance;
-            if (string.IsNullOrEmpty(rvm.PhoneNumber))
+            if (string.IsNullOrEmpty(rvm.Phone))
             {
                 retval.ErrorMessage += "Numer telefonu nie może być pusty.";
             }
             else
             {
-                string values = rvm.PhoneNumber.Replace("+48", "");
+                string values = rvm.Phone.Replace("+48", "");
                 int digit = 0;
                 foreach (char c in values)
                 {
@@ -31,7 +31,7 @@ namespace Rental.Validators
 
 
                 if (digit != 9)
-                    retval.ErrorMessage += "Numer telefonu składa się z 12 cyfr.";
+                    retval.ErrorMessage += "Numer telefonu składa się z 9 cyfr.";
             }
             s.Stop();
             LoggerController.AddEndMethodLog(this.GetType().Name,

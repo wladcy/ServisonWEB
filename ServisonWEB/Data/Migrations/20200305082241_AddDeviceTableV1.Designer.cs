@@ -4,14 +4,16 @@ using Default.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Default.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200305082241_AddDeviceTableV1")]
+    partial class AddDeviceTableV1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -153,32 +155,6 @@ namespace Default.Data.Migrations
                     b.HasKey("ID");
 
                     b.ToTable("Name");
-                });
-
-            modelBuilder.Entity("Default.Data.Repair", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTime>("Acceptance")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("CreateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("DeviceId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("RepairDetail")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("DeviceId");
-
-                    b.ToTable("Repair");
                 });
 
             modelBuilder.Entity("Default.Models.ApplicationUser", b =>
@@ -409,15 +385,6 @@ namespace Default.Data.Migrations
                     b.HasOne("Default.Data.Models", "Model")
                         .WithMany()
                         .HasForeignKey("ModelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Default.Data.Repair", b =>
-                {
-                    b.HasOne("Default.Data.Device", "Device")
-                        .WithMany()
-                        .HasForeignKey("DeviceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

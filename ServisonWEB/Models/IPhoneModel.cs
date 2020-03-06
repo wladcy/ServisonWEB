@@ -2,6 +2,6 @@
 {
     public interface IPhoneModel
     {
-        string PhoneNumber { get; set; }
+        string Phone { get; set; }
     }
 }

@@ -1,0 +1,335 @@
+﻿@model ServisonWEB.Models.ServisonViewModels.AddRepairViewModel
+@{
+    ViewData["Title"] = "Dodaj naprawę";
+    ViewData.AddActivePage(ServisonNavPages.Index);
+    <link rel="stylesheet" href="~/css/jquery-editable-select.css" />
+}
+
+<h1>@ViewData["Title"]</h1>
+<partial name="_StatusMessage" for="StatusMessage" />
+<div class="row">
+    <div class="col-md-6">
+        <form method="post" id="addForm">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <h2>Dane klienta</h2>
+            <div class="form-group">
+                <label asp-for="Client.Name"></label>
+                <select id="a" asp-for="Client.Name" asp-items="@(new SelectList(@Model.Client.Names, "ID", "Value"))" class="form-control" onfocusout="onClientDataChange()"></select>
+                <div class="invalid-feedback">
+                    <span asp-validation-for="Client.Name"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Client.LastName"></label>
+                <select id="b" asp-for="Client.LastName" asp-items="@(new SelectList(@Model.Client.LastNames, "ID", "Value"))" class="form-control" onfocusout="onClientDataChange()"></select>
+                <div class="invalid-feedback">
+                    <span asp-validation-for="Client.LastName"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Client.Phone"></label>
+                <input asp-for="Client.Phone" class="form-control" type="tel" onfocusout="onClientDataChange()" />
+                <div class="invalid-feedback">
+                    <span asp-validation-for="Client.Phone"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Client.Comment"></label>
+                <textarea asp-for="Client.Comment" class="form-control"></textarea>
+                <div class="invalid-feedback">
+                    <span asp-validation-for="Client.Comment"></span>
+                </div>
+            </div>
+            <h2>Dane sprzętu</h2>
+            <div class="form-group">
+                <label asp-for="Device.Brand"></label>
+                <select id="c" asp-for="Device.Brand" asp-items="@(new SelectList(@Model.Device.Brands, "ID", "Value"))" class="form-control" onfocusout="cFocusOut()" disabled></select>
+                <div class="invalid-feedback">
+                    <span asp-validation-for="Device.Brand"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Device.ModelName"></label>
+                <select id="d" asp-for="Device.ModelName" asp-items="@(new SelectList(@Model.Device.ModelNames, "ID", "Value"))" class="form-control" onfocusout="dFocusOut()" disabled></select>
+                <div class="invalid-feedback">
+                    <span asp-validation-for="Device.ModelName"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Device.Comments"></label>
+                <textarea asp-for="Device.Comments" class="form-control"></textarea>
+                <div class="invalid-feedback">
+                    <span asp-validation-for="Device.Comments"></span>
+                </div>
+            </div>
+            <h2>Dane naprawy</h2>
+            <div class="form-group">
+                <label asp-for="Repair.DateOfAcceptance"></label>
+                <input asp-for="Repair.DateOfAcceptance" type="date" class="form-control" />
+                <div class="invalid-feedback">
+                    <span asp-validation-for="Repair.DateOfAcceptance"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Repair.DamageDescription"></label>
+                <textarea asp-for="Repair.DamageDescription" class="form-control"></textarea>
+                <div class="invalid-feedback">
+                    <span asp-validation-for="Repair.DamageDescription"></span>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-outline-primary">Dodaj</button>
+        </form>
+    </div>
+</div>
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+    <script type="text/javascript" src="~/js/jquery-editable-select.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#a").editableSelect();
+            $("#b").editableSelect();
+            $("#c").editableSelect();
+            $("#d").editableSelect();
+            $(".input-validation-error").addClass("is-invalid");
+            $("#Client_Phone").val("");
+            $("#Client_Comment").val("");
+            $("#Device_Comment").val("");
+            $("#Repair_DamageDescription").val("");
+            var myForm = document.getElementById('addForm');
+
+            myForm.addEventListener('submit', function (e) {
+                $(".input-validation-error").addClass("is-invalid");
+                if ($(".input-validation-error").length > 0) {
+                    e.preventDefault();
+                    return;
+                }
+            });
+        });
+
+        function onClientDataChange() {
+            var valid = aFocusOut();
+            valid &= bFocusOut();
+            valid &= phoneValidator();
+            if (valid) {
+                $.ajax({
+                    url: "/Servison/GetBrandsByUserData/",
+                    data: {
+                        name: $("#a").val(),
+                        lastName: $("#b").val(),
+                        phone: $("#Client_Phone").val()
+                    },
+                    success: function (response) {
+                        if (response.length > 0) {
+                            var json = JSON.parse(response)
+                            if (json.length > 0) {
+                                for (i = 0; i < json.length; i++) {
+                                    var itemExist = $(".es-list").get(2).children.length != 0;
+                                if (!itemExist) {
+                                    for (j = 0; j < $(".es-list").get(2).children.length; j++) {
+                                        itemExist = $(".es-list").get(2).children[j].innerHTML.indexOf(json[i]["Value"]) > -1;
+                                        if (itemExist)
+                                            break;
+                                    }
+                                }
+                                if (!itemExist) {
+                                    var li = document.createElement("li");
+                                    li.setAttribute("value", json[i]["ID"]);
+                                    li.setAttribute("class", "es-visible");
+                                    li.innerHTML = json[i]["Value"];
+                                    $(".es-list").get(2).append(li);
+                                }
+                                }
+                            } else {
+                                $(".es-list").get(2).innerHTML = "";
+                                $(".es-list").get(3).innerHTML = "";
+                            }
+
+                        }
+                        else {
+                            $(".es-list").get(2).innerHTML = "";
+                            $(".es-list").get(3).innerHTML = "";
+                        }
+                    }
+                });
+
+                $.ajax({
+                    url: "/Servison/GetClientComment/",
+                    data: {
+                        name: $("#a").val(),
+                        lastName: $("#b").val(),
+                        phone: $("#Client_Phone").val()
+                    },
+                    success: function (response) {
+                        $("#Client_Comment").val(response);
+
+                    }
+                });
+
+                $("#c").prop("disabled", false);
+            } else {
+                $("#c").prop("disabled", true);
+            }
+
+        }
+
+        function aFocusOut() {
+            if ($("#a").val().trim().length > 0) {
+                $("#a").removeClass("is-invalid");
+                $("#a").addClass("is-valid");
+                return true;
+            }
+            else {
+                $("#a").removeClass("is-valid");
+                $("#a").addClass("is-invalid");
+                return false;
+            }
+        }
+
+        function bFocusOut() {
+            if ($("#b").val().trim().length > 0) {
+                $("#b").removeClass("is-invalid");
+                $("#b").addClass("is-valid");
+                return true;
+            }
+            else {
+                $("#b").removeClass("is-valid");
+                $("#b").addClass("is-invalid");
+                return false;
+            }
+        }
+
+        function cFocusOut() {
+            if ($("#c").val() != null && $("#c").val().trim().length > 0) {
+                $("#c").removeClass("is-invalid");
+                $("#c").addClass("is-valid");
+                $("#d").prop("disabled", false);
+                adjustModels()
+            }
+            else {
+                $("#d").prop("disabled", true);
+                $("#d").val("");
+                $("#d").removeClass("is-valid");
+                $("#d").addClass("is-invalid");
+                $("#c").removeClass("is-valid");
+                $("#c").addClass("is-invalid");
+            }
+        }
+
+        function dFocusOut() {
+            if ($("#d").val() != null && $("#d").val().trim().length > 0) {
+                $("#d").removeClass("is-invalid");
+                $("#d").addClass("is-valid");
+
+                $.ajax({
+                    url: "/Servison/GetDeviceComment/",
+                    data: {
+                        name: $("#a").val(),
+                        lastName: $("#b").val(),
+                        phone: $("#Client_Phone").val(),
+                        brand: $("#c").val(),
+                        model: $("#d").val()
+                    },
+                    success: function (response) {
+                        $("#Device_Comments").val(response);
+
+                    }
+                });
+
+            }
+            else {
+                $("#d").removeClass("is-valid");
+                $("#d").addClass("is-invalid");
+            }
+        }
+
+        function phoneValidator() {
+            var phone = $("#Client_Phone").val();
+            if (phoneValueValid(phone.trim())) {
+                $("#Client_Phone").removeClass("is-invalid");
+                $("#Client_Phone").addClass("is-valid");
+                return true;
+            } else {
+                $("#Client_Phone").removeClass("is-valid");
+                $("#Client_Phone").addClass("is-invalid");
+                return false;
+            }
+        }
+
+        function phoneValueValid(phone) {
+            var retval = phone.length > 0;
+            if (retval) {
+                retval = phone.replace(/[^0-9]/g, "").length == 9;
+                if (retval && phone.length != 9) {
+                    retval = phone.replace(/[-]/g, "").length == 2 && phone.length == 11;
+                }
+            }
+            return retval;
+
+        }
+
+        $("#Repair_DateOfAcceptance").change(function () {
+            if ($("#Repair_DateOfAcceptance").val().trim().length > 0) {
+                $("#Repair_DateOfAcceptance").removeClass("is-invalid");
+                $("#Repair_DateOfAcceptance").addClass("is-valid");
+            }
+            else {
+                $("#Repair_DateOfAcceptance").removeClass("is-valid");
+                $("#Repair_DateOfAcceptance").addClass("is-invalid");
+            }
+        });
+
+        $("#Repair_DamageDescription").focusout(function () {
+            if ($("#Repair_DamageDescription").val().trim().length > 0) {
+                $("#Repair_DamageDescription").removeClass("is-invalid");
+                $("#Repair_DamageDescription").addClass("is-valid");
+            }
+            else {
+                $("#Repair_DamageDescription").removeClass("is-valid");
+                $("#Repair_DamageDescription").addClass("is-invalid");
+            }
+        });
+
+        function adjustModels() {
+            $.ajax({
+                url: "/Servison/GetModels/",
+                data: {
+                    name: $("#a").val(),
+                    lastName: $("#b").val(),
+                    phone: $("#Client_Phone").val(),
+                    brand: $("#c").val()
+                },
+                success: function (response) {
+                    if (response.length > 0) {
+                        var json = JSON.parse(response)
+                        console.log(json.length);
+                        if (json.length > 0) {
+                            for (i = 0; i < json.length; i++) {
+                                var itemExist = $(".es-list").get(3).children.length != 0;
+                                if (!itemExist) {
+                                    for (j = 0; j < $(".es-list").get(3).children.length; j++) {
+                                        itemExist = $(".es-list").get(3).children[j].innerHTML.indexOf(json[i]["Value"]) > -1;
+                                        if (itemExist)
+                                            break;
+                                    }
+                                }
+                                if (!itemExist) {
+                                    var li = document.createElement("li");
+                                    li.setAttribute("value", json[i]["ID"]);
+                                    li.setAttribute("class", "es-visible");
+                                    li.innerHTML = json[i]["Value"];
+                                    $(".es-list").get(3).append(li);
+                                }
+                            }
+                        } else {
+                            $(".es-list")[3].innerHTML = "";
+                        }
+                    } else {
+                        $(".es-list")[3].innerHTML = "";
+                    }
+                }
+            });
+        }
+    </script>
+}
+
