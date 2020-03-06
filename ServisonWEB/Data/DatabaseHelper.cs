@@ -190,6 +190,16 @@ namespace ServisonWEB.Data
             return device;
         }
 
+        public List<Repair> GetAllRepair()
+        {
+            List <Repair> repairs = _context.Repair.Include(x => x.Device).
+                Include(x => x.Device.Brand).Include(x => x.Device.Model).
+                Include(x => x.Device.Client).
+                Include(x => x.Device.Client.LastName).
+                Include(x => x.Device.Client.Name).ToList();
+            return repairs;
+        }
+
         private int getDeviceId(AddRepairViewModel data)
         {
             Device device = _context.Device.Include(x => x.Brand).

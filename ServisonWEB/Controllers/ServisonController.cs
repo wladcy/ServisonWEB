@@ -88,6 +88,29 @@ namespace ServisonWEB.Controllers
             return retval;
         }
 
+        [HttpGet]
+        public IActionResult AllRepairs()
+        {
+            List<Repair> repairs = dh.GetAllRepair();
+            List<AddRepairViewModel> model = new List<AddRepairViewModel>();
+            int i = 0;
+            foreach (Repair repair in repairs)
+            {
+                i++;
+                AddRepairViewModel addRepair = createEmptyModel();
+                addRepair.Client.LastName = repair.Device.Client.LastName.LastName;
+                addRepair.Client.Name = repair.Device.Client.Name.Name;
+                addRepair.Client.Phone = repair.Device.Client.Phone;
+                addRepair.Device.Brand = repair.Device.Brand.Brand;
+                addRepair.Device.ModelName = repair.Device.Model.Model;
+                addRepair.Repair.DamageDescription = repair.RepairDetail;
+                addRepair.Repair.DateOfAcceptance = repair.Acceptance;
+                addRepair.Number = i;
+                model.Add(addRepair);
+            }
+            return View(model);
+        }
+
         private AddRepairViewModel createEmptyModel()
         {
             AddRepairViewModel model = new AddRepairViewModel();

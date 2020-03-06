@@ -1,0 +1,44 @@
+﻿@model List<ServisonWEB.Models.ServisonViewModels.AddRepairViewModel>
+@{
+    ViewData["Title"] = "Wszystkie naprawy";
+    ViewData.AddActivePage(ServisonNavPages.AllRepairs);
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.0/bootstrap-table.min.css" rel="stylesheet" />
+    
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<table data-toggle="table" data-sort-name="last_name" data-sort-order="desc">
+    <thead>
+        <tr>
+            <th data-field="lp" data-sortable="false">Lp.</th>
+            <th data-field="last_name" data-sortable="true">Nazwisko</th>
+            <th data-field="name" data-sortable="true">Imię</th>
+            <th data-field="phone" data-sortable="true">Numer telefonu</th>
+            <th data-field="brand" data-sortable="true">Marka</th>
+            <th data-field="models" data-sortable="true">Model</th>
+            <th data-field="acceptance" data-sortable="true">Data przyjęcia</th>
+            <th data-field="description" data-sortable="true">Opis</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Number</td>
+                <td>@item.Client.LastName</td>
+                <td>@item.Client.Name</td>
+                <td>@item.Client.Phone</td>
+                <td>@item.Device.Brand</td>
+                <td>@item.Device.ModelName</td>
+                <td>@item.Repair.DateOfAcceptance.ToLongDateString()</td>
+                <td>@item.Repair.DamageDescription</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.0/bootstrap-table.min.js"></script>
+}

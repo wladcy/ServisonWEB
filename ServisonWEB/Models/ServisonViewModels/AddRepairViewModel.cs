@@ -11,5 +11,6 @@ namespace ServisonWEB.Models.ServisonViewModels
         public DeviceViewModel Device { get; set; } = new DeviceViewModel();
         public RepairViewModel Repair { get; set; } = new RepairViewModel();
         public string StatusMessage { get; set; }
+        public int Number { get; set; }
     }
 }
