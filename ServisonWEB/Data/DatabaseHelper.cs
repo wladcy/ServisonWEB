@@ -1,10 +1,13 @@
-﻿using Default.Data;
+﻿using Admin.Services;
+using Default.Data;
 using Microsoft.EntityFrameworkCore;
 using ServisonWEB.Models;
 using ServisonWEB.Models.ServisonViewModels;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace ServisonWEB.Data
@@ -12,6 +15,7 @@ namespace ServisonWEB.Data
     public class DatabaseHelper
     {
         private readonly ApplicationDbContext _context;
+        private readonly Stopwatch s = new Stopwatch();
 
         public DatabaseHelper(ApplicationDbContext context)
         {
@@ -20,6 +24,8 @@ namespace ServisonWEB.Data
 
         public List<Values> GetAllNames()
         {
+            LoggerController.AddBeginMethodLog(this.GetType().Name, MethodBase.GetCurrentMethod().Name);
+            s.Restart();
             List<Values> retval = new List<Values>();
             List<Names> names = _context.Name.ToList();
             foreach(Names name in names)
@@ -31,11 +37,16 @@ namespace ServisonWEB.Data
                 };
                 retval.Add(v);
             }
+            s.Stop();
+            LoggerController.AddEndMethodLog(this.GetType().Name,
+                MethodBase.GetCurrentMethod().Name, s.ElapsedMilliseconds);
             return retval;
         }
 
         public List<Values> GetAllLastNames()
         {
+            LoggerController.AddBeginMethodLog(this.GetType().Name, MethodBase.GetCurrentMethod().Name);
+            s.Restart();
             List<Values> retval = new List<Values>();
             List<LastNames> names = _context.LastName.ToList();
             foreach (LastNames name in names)
@@ -47,11 +58,16 @@ namespace ServisonWEB.Data
                 };
                 retval.Add(v);
             }
+            s.Stop();
+            LoggerController.AddEndMethodLog(this.GetType().Name,
+                MethodBase.GetCurrentMethod().Name, s.ElapsedMilliseconds);
             return retval;
         }
 
         public List<Values> GetAllBrands()
         {
+            LoggerController.AddBeginMethodLog(this.GetType().Name, MethodBase.GetCurrentMethod().Name);
+            s.Restart();
             List<Values> retval = new List<Values>();
             List<Brands> names = _context.Brand.ToList();
             foreach (Brands name in names)
@@ -63,11 +79,16 @@ namespace ServisonWEB.Data
                 };
                 retval.Add(v);
             }
+            s.Stop();
+            LoggerController.AddEndMethodLog(this.GetType().Name,
+                MethodBase.GetCurrentMethod().Name, s.ElapsedMilliseconds);
             return retval;
         }
 
         public List<Values> GetAllModels()
         {
+            LoggerController.AddBeginMethodLog(this.GetType().Name, MethodBase.GetCurrentMethod().Name);
+            s.Restart();
             List<Values> retval = new List<Values>();
             List<Default.Data.Models> names = _context.Models.ToList();
             foreach (Default.Data.Models name in names)
@@ -79,11 +100,16 @@ namespace ServisonWEB.Data
                 };
                 retval.Add(v);
             }
+            s.Stop();
+            LoggerController.AddEndMethodLog(this.GetType().Name,
+                MethodBase.GetCurrentMethod().Name, s.ElapsedMilliseconds);
             return retval;
         }
 
         public List<Values> GetAllBrandsByUserData(string name, string lastName, string phone)
         {
+            LoggerController.AddBeginMethodLog(this.GetType().Name, MethodBase.GetCurrentMethod().Name);
+            s.Restart();
             List<Values> retval = new List<Values>();
             List<Device> names = _context.Device.Include(x => x.Brand).
                 Include(x => x.Client).Include(x => x.Client.Name).
@@ -116,11 +142,16 @@ namespace ServisonWEB.Data
                     retval.Add(v);
                 }
             }
+            s.Stop();
+            LoggerController.AddEndMethodLog(this.GetType().Name,
+                MethodBase.GetCurrentMethod().Name, s.ElapsedMilliseconds);
             return retval;
         }
 
         public List<Values> GetModels(string name, string lastName, string phone, string brand)
         {
+            LoggerController.AddBeginMethodLog(this.GetType().Name, MethodBase.GetCurrentMethod().Name);
+            s.Restart();
             List<Values> retval = new List<Values>();
             List<Device> names = _context.Device.Include(x => x.Brand).
                 Include(x => x.Client).Include(x => x.Client.Name).
@@ -153,11 +184,16 @@ namespace ServisonWEB.Data
                     retval.Add(v);
                 }
             }
+            s.Stop();
+            LoggerController.AddEndMethodLog(this.GetType().Name,
+                MethodBase.GetCurrentMethod().Name, s.ElapsedMilliseconds);
             return retval;
         }
 
         public void AddRepair(AddRepairViewModel data)
         {
+            LoggerController.AddBeginMethodLog(this.GetType().Name, MethodBase.GetCurrentMethod().Name);
+            s.Restart();
             Repair repair = new Repair();
             repair.Acceptance = data.Repair.DateOfAcceptance;
             repair.CreateTime = DateTime.Now;
@@ -165,20 +201,30 @@ namespace ServisonWEB.Data
             repair.DeviceId = getDeviceId(data);
             _context.Entry(repair).State = EntityState.Added;
             _context.SaveChanges();
+            s.Stop();
+            LoggerController.AddEndMethodLog(this.GetType().Name,
+                MethodBase.GetCurrentMethod().Name, s.ElapsedMilliseconds);
         }
 
         public Client GetClient(string name, string lastName, string phone)
         {
+            LoggerController.AddBeginMethodLog(this.GetType().Name, MethodBase.GetCurrentMethod().Name);
+            s.Restart();
             Client client = _context.Client.Include(x => x.Name).
                 Include(x => x.LastName).
                 Where(c => c.LastName.LastName.Equals(lastName) && 
                     c.Name.Name.Equals(name) && c.Phone.Equals(phone)).
                 FirstOrDefault();
+            s.Stop();
+            LoggerController.AddEndMethodLog(this.GetType().Name,
+                MethodBase.GetCurrentMethod().Name, s.ElapsedMilliseconds);
             return client;
         }
 
         public Device GetDevice(string name, string lastName, string phone, string brand, string model)
         {
+            LoggerController.AddBeginMethodLog(this.GetType().Name, MethodBase.GetCurrentMethod().Name);
+            s.Restart();
             Device device = _context.Device.Include(x => x.Client).
                 Include(x => x.Client.LastName).Include(x=>x.Client.Name).
                 Include(x=>x.Brand).Include(x=>x.Model).
@@ -187,16 +233,24 @@ namespace ServisonWEB.Data
                     d.Client.Phone.Equals(phone) && 
                     d.Brand.Brand.Equals(brand) && d.Model.Model.Equals(model)).
                 FirstOrDefault();
+            s.Stop();
+            LoggerController.AddEndMethodLog(this.GetType().Name,
+                MethodBase.GetCurrentMethod().Name, s.ElapsedMilliseconds);
             return device;
         }
 
         public List<Repair> GetAllRepair()
         {
+            LoggerController.AddBeginMethodLog(this.GetType().Name, MethodBase.GetCurrentMethod().Name);
+            s.Restart();
             List <Repair> repairs = _context.Repair.Include(x => x.Device).
                 Include(x => x.Device.Brand).Include(x => x.Device.Model).
                 Include(x => x.Device.Client).
                 Include(x => x.Device.Client.LastName).
                 Include(x => x.Device.Client.Name).ToList();
+            s.Stop();
+            LoggerController.AddEndMethodLog(this.GetType().Name,
+                MethodBase.GetCurrentMethod().Name, s.ElapsedMilliseconds);
             return repairs;
         }
 

@@ -1,4 +1,5 @@
-﻿using Default.Data;
+﻿using Admin.Services;
+using Default.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -7,7 +8,9 @@ using ServisonWEB.Models;
 using ServisonWEB.Models.ServisonViewModels;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace ServisonWEB.Controllers
@@ -17,6 +20,7 @@ namespace ServisonWEB.Controllers
     public class ServisonController : Controller
     {
         private readonly DatabaseHelper dh;
+        private readonly Stopwatch s = new Stopwatch();
         public ServisonController(ApplicationDbContext context)
         {
             dh = new DatabaseHelper(context);
@@ -31,66 +35,93 @@ namespace ServisonWEB.Controllers
         [HttpPost]
         public IActionResult Index(AddRepairViewModel model)
         {
+            LoggerController.AddBeginMethodLog(this.GetType().Name, MethodBase.GetCurrentMethod().Name);
+            s.Restart();
             if (ModelState.IsValid)
             {
                 dh.AddRepair(model);
                 model = createEmptyModel();
                 model.StatusMessage = "Dane naprawy zostały zapisane.";
             }
+            s.Stop();
+            LoggerController.AddEndMethodLog(this.GetType().Name,
+                MethodBase.GetCurrentMethod().Name, s.ElapsedMilliseconds);
             return View(model);
         }
 
         [HttpGet]
         public string GetBrandsByUserData(string name, string lastName, string phone)
         {
+            LoggerController.AddBeginMethodLog(this.GetType().Name, MethodBase.GetCurrentMethod().Name);
+            s.Restart();
             string retval = string.Empty;
             List<Values> brands = dh.GetAllBrandsByUserData(name, lastName, phone);
             if (brands.Count > 0)
             {
                 retval = JsonConvert.SerializeObject(brands);
             }
+            s.Stop();
+            LoggerController.AddEndMethodLog(this.GetType().Name,
+                MethodBase.GetCurrentMethod().Name, s.ElapsedMilliseconds);
             return retval;
         }
 
         [HttpGet]
         public string GetModels(string name, string lastName, string phone, string brand)
         {
+            LoggerController.AddBeginMethodLog(this.GetType().Name, MethodBase.GetCurrentMethod().Name);
+            s.Restart();
             string retval = string.Empty;
             List<Values> brands = dh.GetModels(name, lastName, phone, brand);
             if (brands.Count > 0)
             {
                 retval = JsonConvert.SerializeObject(brands);
             }
+            s.Stop();
+            LoggerController.AddEndMethodLog(this.GetType().Name,
+                MethodBase.GetCurrentMethod().Name, s.ElapsedMilliseconds);
             return retval;
         }
 
         [HttpGet]
         public string GetClientComment(string name, string lastName, string phone)
         {
+            LoggerController.AddBeginMethodLog(this.GetType().Name, MethodBase.GetCurrentMethod().Name);
+            s.Restart();
             string retval = string.Empty;
             Client client = dh.GetClient(name, lastName, phone);
             if (client != null)
             {
                 retval = client.Comment;
             }
+            s.Stop();
+            LoggerController.AddEndMethodLog(this.GetType().Name,
+                MethodBase.GetCurrentMethod().Name, s.ElapsedMilliseconds);
             return retval;
         }
 
         [HttpGet]
         public string GetDeviceComment(string name, string lastName, string phone, string brand, string model)
         {
+            LoggerController.AddBeginMethodLog(this.GetType().Name, MethodBase.GetCurrentMethod().Name);
+            s.Restart();
             string retval = string.Empty;
             Device device = dh.GetDevice(name, lastName, phone, brand, model);
             if (device != null)
             {
                 retval = device.Comment;
             }
+            s.Stop();
+            LoggerController.AddEndMethodLog(this.GetType().Name,
+                MethodBase.GetCurrentMethod().Name, s.ElapsedMilliseconds);
             return retval;
         }
 
         [HttpGet]
         public IActionResult AllRepairs()
         {
+            LoggerController.AddBeginMethodLog(this.GetType().Name, MethodBase.GetCurrentMethod().Name);
+            s.Restart();
             List<Repair> repairs = dh.GetAllRepair();
             List<AddRepairViewModel> model = new List<AddRepairViewModel>();
             int i = 0;
@@ -108,6 +139,9 @@ namespace ServisonWEB.Controllers
                 addRepair.Number = i;
                 model.Add(addRepair);
             }
+            s.Stop();
+            LoggerController.AddEndMethodLog(this.GetType().Name,
+                MethodBase.GetCurrentMethod().Name, s.ElapsedMilliseconds);
             return View(model);
         }
 
