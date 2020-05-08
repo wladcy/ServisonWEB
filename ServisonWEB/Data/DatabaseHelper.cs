@@ -28,7 +28,7 @@ namespace ServisonWEB.Data
             s.Restart();
             List<Values> retval = new List<Values>();
             List<Names> names = _context.Name.ToList();
-            foreach(Names name in names)
+            foreach (Names name in names)
             {
                 Values v = new Values()
                 {
@@ -114,8 +114,8 @@ namespace ServisonWEB.Data
             List<Device> names = _context.Device.Include(x => x.Brand).
                 Include(x => x.Client).Include(x => x.Client.Name).
                 Include(x => x.Client.LastName).
-                Where(d => d.Client.Name.Name.Equals(name) && 
-                    d.Client.LastName.LastName.Equals(lastName) && 
+                Where(d => d.Client.Name.Name.Equals(name) &&
+                    d.Client.LastName.LastName.Equals(lastName) &&
                     d.Client.Phone.Equals(phone)).ToList();
             if (names.Count > 0)
             {
@@ -155,7 +155,7 @@ namespace ServisonWEB.Data
             List<Values> retval = new List<Values>();
             List<Device> names = _context.Device.Include(x => x.Brand).
                 Include(x => x.Client).Include(x => x.Client.Name).
-                Include(x => x.Client.LastName).Include(x=>x.Model).
+                Include(x => x.Client.LastName).Include(x => x.Model).
                 Where(d => d.Client.Name.Name.Equals(name) &&
                     d.Client.LastName.LastName.Equals(lastName) &&
                     d.Client.Phone.Equals(phone) && d.Brand.Brand.Equals(brand)).ToList();
@@ -173,7 +173,7 @@ namespace ServisonWEB.Data
             }
             else
             {
-                names = _context.Device.Include(x => x.Brand).Include(x=>x.Model).Where(d => d.Brand.Brand.Equals(brand)).ToList();
+                names = _context.Device.Include(x => x.Brand).Include(x => x.Model).Where(d => d.Brand.Brand.Equals(brand)).ToList();
                 foreach (Device device in names)
                 {
                     Values v = new Values()
@@ -212,7 +212,7 @@ namespace ServisonWEB.Data
             s.Restart();
             Client client = _context.Client.Include(x => x.Name).
                 Include(x => x.LastName).
-                Where(c => c.LastName.LastName.Equals(lastName) && 
+                Where(c => c.LastName.LastName.Equals(lastName) &&
                     c.Name.Name.Equals(name) && c.Phone.Equals(phone)).
                 FirstOrDefault();
             s.Stop();
@@ -226,11 +226,11 @@ namespace ServisonWEB.Data
             LoggerController.AddBeginMethodLog(this.GetType().Name, MethodBase.GetCurrentMethod().Name);
             s.Restart();
             Device device = _context.Device.Include(x => x.Client).
-                Include(x => x.Client.LastName).Include(x=>x.Client.Name).
-                Include(x=>x.Brand).Include(x=>x.Model).
-                Where(d=>d.Client.Name.Name.Equals(name) && 
-                    d.Client.LastName.LastName.Equals(lastName) && 
-                    d.Client.Phone.Equals(phone) && 
+                Include(x => x.Client.LastName).Include(x => x.Client.Name).
+                Include(x => x.Brand).Include(x => x.Model).
+                Where(d => d.Client.Name.Name.Equals(name) &&
+                    d.Client.LastName.LastName.Equals(lastName) &&
+                    d.Client.Phone.Equals(phone) &&
                     d.Brand.Brand.Equals(brand) && d.Model.Model.Equals(model)).
                 FirstOrDefault();
             s.Stop();
@@ -243,7 +243,7 @@ namespace ServisonWEB.Data
         {
             LoggerController.AddBeginMethodLog(this.GetType().Name, MethodBase.GetCurrentMethod().Name);
             s.Restart();
-            List <Repair> repairs = _context.Repair.Include(x => x.Device).
+            List<Repair> repairs = _context.Repair.Include(x => x.Device).
                 Include(x => x.Device.Brand).Include(x => x.Device.Model).
                 Include(x => x.Device.Client).
                 Include(x => x.Device.Client.LastName).
@@ -257,9 +257,12 @@ namespace ServisonWEB.Data
         private int getDeviceId(AddRepairViewModel data)
         {
             Device device = _context.Device.Include(x => x.Brand).
-                Include(x => x.Model).Include(x=>x.Client).
-                Where(d => d.Brand.Brand.Equals(data.Device.Brand) && 
-                    d.Model.Model.Equals(data.Device.ModelName)).FirstOrDefault();
+                Include(x => x.Model).Include(x => x.Client).
+                Where(d => d.Brand.Brand.Equals(data.Device.Brand) &&
+                    d.Model.Model.Equals(data.Device.ModelName) && 
+                    d.Client.Name.Name.Equals(data.Client.Name) && 
+                    d.Client.LastName.LastName.Equals(data.Client.LastName) && 
+                    d.Client.Phone.Equals(data.Client.Phone)).FirstOrDefault();
             if (device == null)
             {
                 device = new Device();
@@ -283,7 +286,7 @@ namespace ServisonWEB.Data
         private int getBrandId(string data)
         {
             Brands brand = _context.Brand.Where(b => b.Brand.Equals(data)).FirstOrDefault();
-            if(brand == null)
+            if (brand == null)
             {
                 brand = new Brands();
                 brand.Brand = data;
@@ -298,8 +301,8 @@ namespace ServisonWEB.Data
         {
             Client client = _context.Client.Include(x => x.LastName).
                 Include(x => x.Name).
-                Where(c => c.Name.Name.Equals(data.Name) && 
-                    c.LastName.LastName.Equals(data.LastName) && 
+                Where(c => c.Name.Name.Equals(data.Name) &&
+                    c.LastName.LastName.Equals(data.LastName) &&
                     c.Phone.Equals(data.Phone)).FirstOrDefault();
             if (client == null)
             {
@@ -323,7 +326,7 @@ namespace ServisonWEB.Data
         private int getLastNameId(string data)
         {
             LastNames lastName = _context.LastName.Where(l => l.LastName.Equals(data)).FirstOrDefault();
-            if(lastName == null)
+            if (lastName == null)
             {
                 lastName = new LastNames();
                 lastName.CreateTime = DateTime.Now;
