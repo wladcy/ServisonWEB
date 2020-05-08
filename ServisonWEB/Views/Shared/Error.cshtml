@@ -4,9 +4,9 @@
 }
 
 <h1 class="text-danger">Błąd.</h1>
-<h2 class="text-danger">Wystąpił blad podczas przetwarzania żądania.</h2>
+<h2 class="text-danger">Wystąpił błąd podczas przetwarzania żądania.</h2>
 
-@if (Model.ShowRequestId)
+@if (Model != null && Model.ShowRequestId)
 {
     <p>
         <strong>Request ID:</strong> <code>@Model.RequestId</code>

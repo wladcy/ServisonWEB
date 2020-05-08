@@ -16,21 +16,23 @@ namespace Default.Controllers
     public class HomeController : Controller
     {
         public IActionResult Index(IndexViewModel model)
-        { 
+        {
             return View(model);
         }
 
         public IActionResult Error()
         {
             var exceptionData = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
-            var exception = exceptionData.Error;
-            LoggerController.AddExceptionLog(this.GetType().Name, exception);
-            EmailSender smc = new EmailSender();
-            smc.IsHtmlBody = false;
-            smc.SendEmailAsync("mateusz.slezak1@gmail.com", SettingsController.AppName.Name + " - Error", "" +
-                "Wiadomość błędu: " + exception.Message + "\nStos wyjątku: " +
-                exception.StackTrace + "\nWyjątek: " + exception.InnerException);
-
+            if (exceptionData != null)
+            {
+                var exception = exceptionData.Error;
+                LoggerController.AddExceptionLog(this.GetType().Name, exception);
+                EmailSender smc = new EmailSender();
+                smc.IsHtmlBody = false;
+                smc.SendEmailAsync("mateusz.slezak1@gmail.com", SettingsController.AppName.Name + " - Error", "" +
+                    "Wiadomość błędu: " + exception.Message + "\nStos wyjątku: " +
+                    exception.StackTrace + "\nWyjątek: " + exception.InnerException);
+            }
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
