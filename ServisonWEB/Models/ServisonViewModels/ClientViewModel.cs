@@ -1,5 +1,6 @@
 ﻿using Rental.Models;
 using Rental.Validators;
+using ServisonWEB.Validators;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -10,13 +11,10 @@ namespace ServisonWEB.Models.ServisonViewModels
 {
     public class ClientViewModel: IPhoneModel
     {
-        [Required(ErrorMessage ="Imię jest wymagane.")]
-        [Display(Name="Imię")]
+        [Required(ErrorMessage ="Imię i nazwisko jest wymagane.")]
+        [NameValidator]
+        [Display(Name="Imię i nazwisko")]
         public string Name { get; set; }
-
-        [Required(ErrorMessage ="Nazwisko jest wymagane.")]
-        [Display(Name="Nazwisko")]
-        public string LastName { get; set; }
 
         [Required(ErrorMessage ="Numer telefonu jest wymagany.")]
         [PhoneValidator]
@@ -28,6 +26,5 @@ namespace ServisonWEB.Models.ServisonViewModels
         public string Comment { get; set; }
 
         public List<Values> Names { get; set; }
-        public List<Values> LastNames { get; set; }
     }
 }

@@ -40,8 +40,11 @@ namespace ServisonWEB.Controllers
             if (ModelState.IsValid)
             {
                 dh.AddRepair(model);
+                model = createEmptyModel("Dane naprawy zostały zapisane.");
+            }
+            else
+            {
                 model = createEmptyModel();
-                model.StatusMessage = "Dane naprawy zostały zapisane.";
             }
             s.Stop();
             LoggerController.AddEndMethodLog(this.GetType().Name,
@@ -50,12 +53,12 @@ namespace ServisonWEB.Controllers
         }
 
         [HttpGet]
-        public string GetBrandsByUserData(string name, string lastName, string phone)
+        public string GetBrandsByUserData(string name, string phone)
         {
             LoggerController.AddBeginMethodLog(this.GetType().Name, MethodBase.GetCurrentMethod().Name);
             s.Restart();
             string retval = string.Empty;
-            List<Values> brands = dh.GetAllBrandsByUserData(name, lastName, phone);
+            List<Values> brands = dh.GetAllBrandsByUserData(name, phone);
             if (brands.Count > 0)
             {
                 retval = JsonConvert.SerializeObject(brands);
@@ -67,12 +70,12 @@ namespace ServisonWEB.Controllers
         }
 
         [HttpGet]
-        public string GetModels(string name, string lastName, string phone, string brand)
+        public string GetModels(string name, string phone, string brand)
         {
             LoggerController.AddBeginMethodLog(this.GetType().Name, MethodBase.GetCurrentMethod().Name);
             s.Restart();
             string retval = string.Empty;
-            List<Values> brands = dh.GetModels(name, lastName, phone, brand);
+            List<Values> brands = dh.GetModels(name, phone, brand);
             if (brands.Count > 0)
             {
                 retval = JsonConvert.SerializeObject(brands);
@@ -84,12 +87,12 @@ namespace ServisonWEB.Controllers
         }
 
         [HttpGet]
-        public string GetClientComment(string name, string lastName, string phone)
+        public string GetClientComment(string name, string phone)
         {
             LoggerController.AddBeginMethodLog(this.GetType().Name, MethodBase.GetCurrentMethod().Name);
             s.Restart();
             string retval = string.Empty;
-            Client client = dh.GetClient(name, lastName, phone);
+            Client client = dh.GetClient(name, phone);
             if (client != null)
             {
                 retval = client.Comment;
@@ -101,12 +104,12 @@ namespace ServisonWEB.Controllers
         }
 
         [HttpGet]
-        public string GetDeviceComment(string name, string lastName, string phone, string brand, string model)
+        public string GetDeviceComment(string name, string phone, string brand, string model)
         {
             LoggerController.AddBeginMethodLog(this.GetType().Name, MethodBase.GetCurrentMethod().Name);
             s.Restart();
             string retval = string.Empty;
-            Device device = dh.GetDevice(name, lastName, phone, brand, model);
+            Device device = dh.GetDevice(name, phone, brand, model);
             if (device != null)
             {
                 retval = device.Comment;
@@ -129,8 +132,7 @@ namespace ServisonWEB.Controllers
             {
                 i++;
                 AddRepairViewModel addRepair = createEmptyModel();
-                addRepair.Client.LastName = repair.Device.Client.LastName.LastName;
-                addRepair.Client.Name = repair.Device.Client.Name.Name;
+                addRepair.Client.Name = repair.Device.Client.Name.Name + " " + repair.Device.Client.LastName.LastName;
                 addRepair.Client.Phone = repair.Device.Client.Phone;
                 addRepair.Device.Brand = repair.Device.Brand.Brand;
                 addRepair.Device.ModelName = repair.Device.Model.Model;
@@ -145,15 +147,15 @@ namespace ServisonWEB.Controllers
             return View(model);
         }
 
-        private AddRepairViewModel createEmptyModel()
+        private AddRepairViewModel createEmptyModel(string statusMessage="")
         {
             AddRepairViewModel model = new AddRepairViewModel();
             ClientViewModel clientModel = new ClientViewModel();
-            clientModel.Names = dh.GetAllNames();
-            clientModel.LastNames = dh.GetAllLastNames();
+            clientModel.Names = dh.GetAllNames();           
             model.Client = clientModel;
             DeviceViewModel deviceModel = new DeviceViewModel();
             model.Device = deviceModel;
+            model.StatusMessage = statusMessage;
             return model;
         }
     }

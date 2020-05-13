@@ -27,36 +27,19 @@ namespace ServisonWEB.Data
             LoggerController.AddBeginMethodLog(this.GetType().Name, MethodBase.GetCurrentMethod().Name);
             s.Restart();
             List<Values> retval = new List<Values>();
-            List<Names> names = _context.Name.ToList();
-            foreach (Names name in names)
+            List<Client> clients = _context.Client.Include(x=>x.Name).Include(x=>x.LastName).ToList();
+            foreach (Client client in clients)
             {
                 Values v = new Values()
                 {
-                    Value = name.Name,
-                    ID = name.ID
+                    Value = client.Name.Name + " " + client.LastName.LastName,
+                    ID = client.ID
                 };
-                retval.Add(v);
-            }
-            s.Stop();
-            LoggerController.AddEndMethodLog(this.GetType().Name,
-                MethodBase.GetCurrentMethod().Name, s.ElapsedMilliseconds);
-            return retval;
-        }
-
-        public List<Values> GetAllLastNames()
-        {
-            LoggerController.AddBeginMethodLog(this.GetType().Name, MethodBase.GetCurrentMethod().Name);
-            s.Restart();
-            List<Values> retval = new List<Values>();
-            List<LastNames> names = _context.LastName.ToList();
-            foreach (LastNames name in names)
-            {
-                Values v = new Values()
+                Values name = retval.Where(x => x.Value.Equals(v.Value)).FirstOrDefault();
+                if (name == null)
                 {
-                    Value = name.LastName,
-                    ID = name.ID
-                };
-                retval.Add(v);
+                    retval.Add(v);
+                }
             }
             s.Stop();
             LoggerController.AddEndMethodLog(this.GetType().Name,
@@ -106,16 +89,23 @@ namespace ServisonWEB.Data
             return retval;
         }
 
-        public List<Values> GetAllBrandsByUserData(string name, string lastName, string phone)
+        public List<Values> GetAllBrandsByUserData(string name, string phone)
         {
             LoggerController.AddBeginMethodLog(this.GetType().Name, MethodBase.GetCurrentMethod().Name);
             s.Restart();
+            string[] tmp = name.Split(' ');
+            string _name = tmp[0];
+            string _lastName = string.Empty;
+            if (tmp.Length > 1)
+            {
+                _lastName = tmp[1];
+            }
             List<Values> retval = new List<Values>();
             List<Device> names = _context.Device.Include(x => x.Brand).
                 Include(x => x.Client).Include(x => x.Client.Name).
                 Include(x => x.Client.LastName).
-                Where(d => d.Client.Name.Name.Equals(name) &&
-                    d.Client.LastName.LastName.Equals(lastName) &&
+                Where(d => d.Client.Name.Name.Equals(_name) &&
+                    d.Client.LastName.LastName.Equals(_lastName) &&
                     d.Client.Phone.Equals(phone)).ToList();
             if (names.Count > 0)
             {
@@ -148,16 +138,23 @@ namespace ServisonWEB.Data
             return retval;
         }
 
-        public List<Values> GetModels(string name, string lastName, string phone, string brand)
+        public List<Values> GetModels(string name, string phone, string brand)
         {
             LoggerController.AddBeginMethodLog(this.GetType().Name, MethodBase.GetCurrentMethod().Name);
             s.Restart();
+            string[] tmp = name.Split(' ');
+            string _name = tmp[0];
+            string _lastName = string.Empty;
+            if (tmp.Length > 1)
+            {
+                _lastName = tmp[1];
+            }
             List<Values> retval = new List<Values>();
             List<Device> names = _context.Device.Include(x => x.Brand).
                 Include(x => x.Client).Include(x => x.Client.Name).
                 Include(x => x.Client.LastName).Include(x => x.Model).
-                Where(d => d.Client.Name.Name.Equals(name) &&
-                    d.Client.LastName.LastName.Equals(lastName) &&
+                Where(d => d.Client.Name.Name.Equals(_name) &&
+                    d.Client.LastName.LastName.Equals(_lastName) &&
                     d.Client.Phone.Equals(phone) && d.Brand.Brand.Equals(brand)).ToList();
             if (names.Count > 0)
             {
@@ -206,14 +203,21 @@ namespace ServisonWEB.Data
                 MethodBase.GetCurrentMethod().Name, s.ElapsedMilliseconds);
         }
 
-        public Client GetClient(string name, string lastName, string phone)
+        public Client GetClient(string name, string phone)
         {
             LoggerController.AddBeginMethodLog(this.GetType().Name, MethodBase.GetCurrentMethod().Name);
             s.Restart();
+            string[] tmp = name.Split(' ');
+            string _name = tmp[0];
+            string _lastName = string.Empty;
+            if (tmp.Length > 1)
+            {
+                _lastName = tmp[1];
+            }
             Client client = _context.Client.Include(x => x.Name).
                 Include(x => x.LastName).
-                Where(c => c.LastName.LastName.Equals(lastName) &&
-                    c.Name.Name.Equals(name) && c.Phone.Equals(phone)).
+                Where(c => c.LastName.LastName.Equals(_lastName) &&
+                    c.Name.Name.Equals(_name) && c.Phone.Equals(phone)).
                 FirstOrDefault();
             s.Stop();
             LoggerController.AddEndMethodLog(this.GetType().Name,
@@ -221,15 +225,22 @@ namespace ServisonWEB.Data
             return client;
         }
 
-        public Device GetDevice(string name, string lastName, string phone, string brand, string model)
+        public Device GetDevice(string name, string phone, string brand, string model)
         {
             LoggerController.AddBeginMethodLog(this.GetType().Name, MethodBase.GetCurrentMethod().Name);
             s.Restart();
+            string[] tmp = name.Split(' ');
+            string _name = tmp[0];
+            string _lastName = string.Empty;
+            if (tmp.Length > 1)
+            {
+                _lastName = tmp[1];
+            }
             Device device = _context.Device.Include(x => x.Client).
                 Include(x => x.Client.LastName).Include(x => x.Client.Name).
                 Include(x => x.Brand).Include(x => x.Model).
-                Where(d => d.Client.Name.Name.Equals(name) &&
-                    d.Client.LastName.LastName.Equals(lastName) &&
+                Where(d => d.Client.Name.Name.Equals(_name) &&
+                    d.Client.LastName.LastName.Equals(_lastName) &&
                     d.Client.Phone.Equals(phone) &&
                     d.Brand.Brand.Equals(brand) && d.Model.Model.Equals(model)).
                 FirstOrDefault();
@@ -256,12 +267,14 @@ namespace ServisonWEB.Data
 
         private int getDeviceId(AddRepairViewModel data)
         {
+            string name = data.Client.Name.Split(' ')[0];
+            string lastName = data.Client.Name.Split(' ')[1];
             Device device = _context.Device.Include(x => x.Brand).
                 Include(x => x.Model).Include(x => x.Client).
                 Where(d => d.Brand.Brand.Equals(data.Device.Brand) &&
                     d.Model.Model.Equals(data.Device.ModelName) && 
-                    d.Client.Name.Name.Equals(data.Client.Name) && 
-                    d.Client.LastName.LastName.Equals(data.Client.LastName) && 
+                    d.Client.Name.Name.Equals(name) && 
+                    d.Client.LastName.LastName.Equals(lastName) && 
                     d.Client.Phone.Equals(data.Client.Phone)).FirstOrDefault();
             if (device == null)
             {
@@ -299,16 +312,18 @@ namespace ServisonWEB.Data
 
         private int getClientId(ClientViewModel data)
         {
+            string name = data.Name.Split(' ')[0];
+            string lastName = data.Name.Split(' ')[1];
             Client client = _context.Client.Include(x => x.LastName).
                 Include(x => x.Name).
-                Where(c => c.Name.Name.Equals(data.Name) &&
-                    c.LastName.LastName.Equals(data.LastName) &&
+                Where(c => c.Name.Name.Equals(name) &&
+                    c.LastName.LastName.Equals(lastName) &&
                     c.Phone.Equals(data.Phone)).FirstOrDefault();
             if (client == null)
             {
                 client = new Client();
-                client.ClientLastNameId = getLastNameId(data.LastName);
-                client.ClientNameId = getNameId(data.Name);
+                client.ClientLastNameId = getLastNameId(lastName);
+                client.ClientNameId = getNameId(name);
                 client.Comment = data.Comment;
                 client.CreateTime = DateTime.Now;
                 client.Phone = data.Phone;

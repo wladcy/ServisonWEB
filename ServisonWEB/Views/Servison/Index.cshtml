@@ -20,13 +20,6 @@
                 </div>
             </div>
             <div class="form-group">
-                <label asp-for="Client.LastName"></label>
-                <select id="b" asp-for="Client.LastName" asp-items="@(new SelectList(@Model.Client.LastNames, "ID", "Value"))" class="form-control" onfocusout="onClientDataChange()"></select>
-                <div class="invalid-feedback">
-                    <span asp-validation-for="Client.LastName"></span>
-                </div>
-            </div>
-            <div class="form-group">
                 <label asp-for="Client.Phone"></label>
                 <input asp-for="Client.Phone" class="form-control" type="tel" onfocusout="onClientDataChange()" />
                 <div class="invalid-feedback">
@@ -86,9 +79,10 @@
 
     <script type="text/javascript" src="~/js/jquery-editable-select.js"></script>
     <script type="text/javascript">
+        var brands = [];
+        var models = [];
         $(document).ready(function () {
             $("#a").editableSelect();
-            $("#b").editableSelect();
             $("#c").editableSelect();
             $("#d").editableSelect();
             $(".input-validation-error").addClass("is-invalid");
@@ -109,46 +103,41 @@
 
         function onClientDataChange() {
             var valid = aFocusOut();
-            valid &= bFocusOut();
             valid &= phoneValidator();
             if (valid) {
                 $.ajax({
                     url: "/Servison/GetBrandsByUserData/",
                     data: {
                         name: $("#a").val(),
-                        lastName: $("#b").val(),
                         phone: $("#Client_Phone").val()
                     },
                     success: function (response) {
                         if (response.length > 0) {
                             var json = JSON.parse(response)
-                            if (json.length > 0) {
-                                for (i = 0; i < json.length; i++) {
-                                    var itemExist = $(".es-list").get(2).children.length != 0;
-                                if (!itemExist) {
-                                    for (j = 0; j < $(".es-list").get(2).children.length; j++) {
-                                        itemExist = $(".es-list").get(2).children[j].innerHTML.indexOf(json[i]["Value"]) > -1;
-                                        if (itemExist)
-                                            break;
+                            if (json.length > 0) {  
+                                $("#c").val("");
+                                $(".es-list").get(1).innerHTML = "";
+                                $(".es-list").get(2).innerHTML = "";
+                                brands = new Array();
+                                for (i = 0; i < json.length; i++) {                                    
+                                    if (!brands.includes(json[i]["Value"])) {
+                                        var li = document.createElement("li");
+                                        li.setAttribute("value", json[i]["ID"]);
+                                        li.setAttribute("class", "es-visible");
+                                        li.innerHTML = json[i]["Value"];
+                                        $(".es-list").get(1).append(li);
+                                        brands.push(json[i]["Value"]);
                                     }
                                 }
-                                if (!itemExist) {
-                                    var li = document.createElement("li");
-                                    li.setAttribute("value", json[i]["ID"]);
-                                    li.setAttribute("class", "es-visible");
-                                    li.innerHTML = json[i]["Value"];
-                                    $(".es-list").get(2).append(li);
-                                }
-                                }
                             } else {
+                                $(".es-list").get(1).innerHTML = "";
                                 $(".es-list").get(2).innerHTML = "";
-                                $(".es-list").get(3).innerHTML = "";
                             }
 
                         }
                         else {
+                            $(".es-list").get(1).innerHTML = "";
                             $(".es-list").get(2).innerHTML = "";
-                            $(".es-list").get(3).innerHTML = "";
                         }
                     }
                 });
@@ -157,7 +146,6 @@
                     url: "/Servison/GetClientComment/",
                     data: {
                         name: $("#a").val(),
-                        lastName: $("#b").val(),
                         phone: $("#Client_Phone").val()
                     },
                     success: function (response) {
@@ -182,19 +170,6 @@
             else {
                 $("#a").removeClass("is-valid");
                 $("#a").addClass("is-invalid");
-                return false;
-            }
-        }
-
-        function bFocusOut() {
-            if ($("#b").val().trim().length > 0) {
-                $("#b").removeClass("is-invalid");
-                $("#b").addClass("is-valid");
-                return true;
-            }
-            else {
-                $("#b").removeClass("is-valid");
-                $("#b").addClass("is-invalid");
                 return false;
             }
         }
@@ -295,7 +270,6 @@
                 url: "/Servison/GetModels/",
                 data: {
                     name: $("#a").val(),
-                    lastName: $("#b").val(),
                     phone: $("#Client_Phone").val(),
                     brand: $("#c").val()
                 },
@@ -304,28 +278,24 @@
                         var json = JSON.parse(response)
                         console.log(json.length);
                         if (json.length > 0) {
+                            $("#d").val("");
+                            $(".es-list")[2].innerHTML = "";
+                            models = new Array();
                             for (i = 0; i < json.length; i++) {
-                                var itemExist = $(".es-list").get(3).children.length != 0;
-                                if (!itemExist) {
-                                    for (j = 0; j < $(".es-list").get(3).children.length; j++) {
-                                        itemExist = $(".es-list").get(3).children[j].innerHTML.indexOf(json[i]["Value"]) > -1;
-                                        if (itemExist)
-                                            break;
-                                    }
-                                }
-                                if (!itemExist) {
+                                if (!models.includes(json[i]["Value"])) {
                                     var li = document.createElement("li");
                                     li.setAttribute("value", json[i]["ID"]);
                                     li.setAttribute("class", "es-visible");
                                     li.innerHTML = json[i]["Value"];
-                                    $(".es-list").get(3).append(li);
+                                    $(".es-list").get(2).append(li);
+                                    models.push(json[i]["Value"]);
                                 }
                             }
                         } else {
-                            $(".es-list")[3].innerHTML = "";
+                            $(".es-list")[2].innerHTML = "";
                         }
                     } else {
-                        $(".es-list")[3].innerHTML = "";
+                        $(".es-list")[2].innerHTML = "";
                     }
                 }
             });

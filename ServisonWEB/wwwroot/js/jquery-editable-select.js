@@ -8,7 +8,7 @@
 +(function ($) {
 	// jQuery Editable Select
 	EditableSelect = function (select, options) {
-		var that     = this;
+		var that = this;
 		
 		this.options = options;
 		this.$select = $(select);
@@ -33,8 +33,7 @@
 	EditableSelect.DEFAULTS = { filter: true, effects: 'default', duration: 'fast', trigger: 'focus' };
 	EditableSelect.prototype.filter = function () {
 		var hiddens = 0;
-		var search  = this.$input.val().toLowerCase().trim();
-		
+		var search = this.$input.val().toLowerCase().trim();		
 		this.$list.find('li').addClass('es-visible').show();
 		if (this.options.filter) {
 			hiddens = this.$list.find('li').filter(function (i, li) { return $(li).text().toLowerCase().indexOf(search) < 0; }).hide().removeClass('es-visible').length;
@@ -42,19 +41,22 @@
 		}
 	};
 	EditableSelect.prototype.show = function () {
-		this.$list.css({
-			top:   this.$input.position().top + this.$input.outerHeight() - 1,
-			left:  this.$input.position().left,
-			width: this.$input.outerWidth()
-		});
-		
-		if (!this.$list.is(':visible') && this.$list.find('li.es-visible').length > 0) {
-			var fns = { default: 'show', fade: 'fadeIn', slide: 'slideDown' };
-			var fn  = fns[this.options.effects];
-			
-			this.utility.trigger('show');
-			this.$input.addClass('open');
-			this.$list[fn](this.options.duration, $.proxy(this.utility.trigger, this.utility, 'shown'));
+		var value = this.$input.val();
+		if (value.length > 0) {
+			this.$list.css({
+				top: this.$input.position().top + this.$input.outerHeight() - 1,
+				left: this.$input.position().left,
+				width: this.$input.outerWidth()
+			});
+
+			if (!this.$list.is(':visible') && this.$list.find('li.es-visible').length > 0) {
+				var fns = { default: 'show', fade: 'fadeIn', slide: 'slideDown' };
+				var fn = fns[this.options.effects];
+
+				this.utility.trigger('show');
+				this.$input.addClass('open');
+				this.$list[fn](this.options.duration, $.proxy(this.utility.trigger, this.utility, 'shown'));
+			}
 		}
 	};
 	EditableSelect.prototype.hide = function () {
@@ -65,7 +67,7 @@
 		this.$input.removeClass('open');
 		this.$list[fn](this.options.duration, $.proxy(this.utility.trigger, this.utility, 'hidden'));
 	};
-	EditableSelect.prototype.select = function ($li) {
+	EditableSelect.prototype.select = function ($li) {		
 		if (!this.$list.has($li) || !$li.is('li.es-visible:not([disabled])')) return;
 		this.$input.val($li.text());
 		if (this.options.filter) this.hide();
@@ -127,34 +129,34 @@
 		});
 		that.es.filter();
 	};
-	EditableSelectUtility.prototype.initializeList = function () {
+	EditableSelectUtility.prototype.initializeList = function () {		
 		var that = this;
 		that.es.$list
-			.on('mousemove', 'li:not([disabled])', function () {
+			.on('mousemove', 'li:not([disabled])', function () {				
 				that.es.$list.find('.selected').removeClass('selected');
 				$(this).addClass('selected');
 			})
-			.on('mousedown', 'li', function (e) {
+			.on('mousedown', 'li', function (e) {				
 				if ($(this).is('[disabled]')) e.preventDefault();
 				else that.es.select($(this));
 			})
-			.on('mouseup', function () {
+			.on('mouseup', function () {				
 				that.es.$list.find('li.selected').removeClass('selected');
 			});
 	};
-	EditableSelectUtility.prototype.initializeInput = function () {
+	EditableSelectUtility.prototype.initializeInput = function () {		
 		var that = this;
 		switch (this.es.options.trigger) {
 			default:
 			case 'focus':
 				that.es.$input
 					.on('focus', $.proxy(that.es.show, that.es))
-					.on('blur', $.proxy(that.es.hide, that.es));
+					.on('blur', $.proxy(that.es.hide, that.es));				
 				break;
 			case 'manual':
 				break;
 		}
-		that.es.$input.on('input keydown', function (e) {
+		that.es.$input.on('input keydown', function (e) {			
 			switch (e.keyCode) {
 				case 38: // Up
 					var visibles = that.es.$list.find('li.es-visible:not([disabled])');
@@ -178,9 +180,14 @@
 				case 27: // Esc
 					that.es.hide();
 					break;
-				default:
-					that.es.filter();
-					that.highlight(0);
+				default:					
+					var text = that.es.$input.val();					
+					if (text.length > 0) {
+						that.es.filter();
+						that.highlight(0);
+					} else {
+						that.es.hide();
+                    }
 					break;
 			}
 		});
